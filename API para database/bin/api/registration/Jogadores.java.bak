@@ -1,0 +1,94 @@
+package api.registration;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitRunnable;
+
+import api.main.Main;
+import api.utils.Utilidades;
+
+public class Jogadores {
+	
+	public static Map<String, Util> info = new HashMap<String, Util>();
+	public static Map<String, Boolean> logado = new HashMap<String, Boolean>();
+	public static Map<Integer, String> tags = new HashMap<Integer, String>();
+	
+	public Player p;
+	
+	public Jogadores(Player jogador) {
+		p=jogador;
+	}
+	
+	public static void initiateRegistration(Player player) {
+		if(!info.containsKey(player.getName())) {
+			Utilidades.sendTitle(player, "§a§lBem vindo!", "§e/register <senha> <confirmarsenha>", 10, 600, 20);
+		}else {
+			Utilidades.sendTitle(player, "§a§lBem vindo!", "§e/login <senha>", 10, 600, 20);
+		}
+		
+		new BukkitRunnable() {
+			int x = 30;
+			public void run() {
+				if(x!=0) {
+					x-=1;
+					
+					if(info.containsKey(player.getName())&&info.get(player.getName()).isOnline()) {
+						cancel();
+					}
+				}else {
+					if(info.containsKey(player.getName())) {
+						if(!info.get(player.getName()).isOnline()) {
+							player.kickPlayer("§cDemorou para realizar o login.");
+						}
+					}else {
+						player.kickPlayer("§cDemorou para realizar o login.");
+					}
+					
+					cancel();
+				}
+			}
+		}.runTaskTimer(Main.plugin, 0, 20);
+	}
+	
+	public void quit() {
+		if(isOnline()) {
+			info.get(p.getName()).setOnline(false);
+			logado.put(p.getName(), false);
+		}
+	}
+	
+	public void setGroup(String grupo) {
+		
+	}
+	
+	public String getTag() {
+		return info.get(p.getName()).getTag();
+	}
+	
+	public String getPassword() {
+		return info.get(p.getName()).getSenha();
+	}
+	
+	public boolean isRegistered() {
+		return info.containsKey(p.getName());
+	}
+	
+	public boolean isOnline() {
+		return info.containsKey(p.getName())&&info.get(p.getName()).isOnline();
+	}
+	
+	public boolean password(String pass) {
+		return info.get(p.getName()).getSenha().equals(pass);
+	}
+	
+	public boolean isVip() {
+		return info.containsKey(p.getName())&&info.get(p.getName()).getVip()!=0;
+	}
+	
+	public boolean isStaff() {
+		return info.containsKey(p.getName())&&info.get(p.getName()).isStaff();
+	}
+
+}
